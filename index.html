@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pay with PayPal</title>
+    <script src="https://www.paypal.com/sdk/js?client-id=AUsUB0XbE33-ZcD0Z3PQjjbQ2hg7KZONmgEcsNnjcSFu9gAqh4bjPwTTASAoHMldCin60I0ucWcxE8xE"></script>
+</head>
+<body>
+
+<h2>Pay for the Course</h2>
+<div id="paypal-button-container"></div>
+
+<!-- Display License Key here -->
+<h3>Your License Key:</h3>
+<div id="licenseKeyContainer">
+    <p>Your license key will be displayed after payment.</p>
+</div>
+
+<script>
+    paypal.Buttons({
+    createOrder: async () => {
+        const response = await fetch('https://paypal12.onrender.com/api/paypal/create-order', { 
+            method: 'POST', 
+            body: JSON.stringify({ price: "10", currency: "USD" }),  // Example data
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+        return data.orderID;  
+    },
+
+    onApprove: async (data, actions) => {
+        const orderID = data.orderID;
+        const response = await fetch(`https://paypal12.onrender.com/api/paypal/capture-order`, { 
+            method: 'POST', 
+            body: JSON.stringify({ orderID }), 
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const result = await response.json();
+        if (result.licenseKey) {
+            window.location.href = `/complete-order?licenseKey=${result.licenseKey}`;  // This redirects to your local /complete-order route
+        } else {
+            alert('Error: License key generation failed');
+        }
+    },
+
+    onCancel: () => {
+        window.location.href = 'https://paypal12.onrender.com/cancel-order';
+    }
+}).render('#paypal-button-container');
+
+
+    // Function to extract query parameter from the URL
+    function getQueryParameter(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+
+    // Get the 'licenseKey' from the URL
+    const licenseKey = getQueryParameter('licenseKey');
+
+    // If a license key is found, display it
+    if (licenseKey) {
+        const licenseKeyContainer = document.getElementById('licenseKeyContainer');
+        licenseKeyContainer.innerHTML = `<p>Your license key is: <strong>${licenseKey}</strong></p>`;
+    } else {
+        console.log("No license key found in URL.");
+    }
+</script>
+
+</body>
+</html>
