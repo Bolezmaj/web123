@@ -20,7 +20,7 @@
 <script>
     paypal.Buttons({
     createOrder: async () => {
-        const response = await fetch('https://paypalemailtest123.onrender.com/api/paypal/create-order', { 
+        const response = await fetch('https://paypal12.onrender.com/api/paypal/create-order', { 
             method: 'POST', 
             body: JSON.stringify({ price: "0", currency: "USD" }),  // Example data
             headers: { 'Content-Type': 'application/json' }
@@ -31,7 +31,7 @@
 
     onApprove: async (data, actions) => {
         const orderID = data.orderID;
-        const response = await fetch(`https://paypalemailtest123.onrender.com/api/paypal/capture-order`, { 
+        const response = await fetch(`https://paypal12.onrender.com/api/paypal/capture-order`, { 
             method: 'POST', 
             body: JSON.stringify({ orderID }), 
             headers: { 'Content-Type': 'application/json' }
@@ -45,7 +45,7 @@
     },
 
     onCancel: () => {
-        window.location.href = 'https://paypalemailtest123.onrender.com/cancel-order';
+        window.location.href = 'https://paypal12.onrender.com/cancel-order';
     }
 }).render('#paypal-button-container');
 
